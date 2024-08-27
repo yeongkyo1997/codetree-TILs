@@ -24,18 +24,22 @@ def bfs(board):
 
 
 # 방화벽 설치
-def dfs(board, depth):
+def dfs(board, depth, row, col):
     if depth == 3:
         bfs(board)
         return
 
-    for i in range(n):
-        for j in range(m):
+    for i in range(row, n):
+        for j in range(col, m):
             tmp = copy.deepcopy(board)
             if tmp[i][j] == 0:
                 tmp[i][j] = 1
-                dfs(tmp, depth + 1)
+                if j == m - 1:
+                    dfs(tmp, depth + 1, row + 1, 0)
+                else:
+                    dfs(tmp, depth + 1, row, col + 1)
                 tmp[i][j] = 0
+        col = 0
 
 
 if __name__ == '__main__':
@@ -54,5 +58,5 @@ if __name__ == '__main__':
                 fire.append((i, j))
 
     result = 0
-    dfs(board, 0)
+    dfs(board, 0, 0, 0)
     print(result)
