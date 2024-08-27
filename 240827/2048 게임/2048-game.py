@@ -1,98 +1,107 @@
 import copy
 
-
-# 오른쪽
 def right(board):
     for row in range(n):
-        # 기준점을 잡고 같으면 합체 아니면 이전까지 이동
+        merged = [False] * n
         for pivot in range(n - 1, 0, -1):
+            if board[row][pivot] == 0:
+                continue
             for i in range(pivot - 1, -1, -1):
-                if board[row][i] != 0:
-                    # 기준점이 0이면 위치로 이동
-                    if board[row][pivot] == 0:
-                        board[row][pivot] = board[row][i]
-                        board[row][i] = 0
+                if board[row][i] == 0:
+                    continue
+                if board[row][pivot] == board[row][i] and not merged[pivot]:
+                    board[row][pivot] *= 2
+                    board[row][i] = 0
+                    merged[pivot] = True
+                elif board[row][pivot] == 0:
+                    board[row][pivot] = board[row][i]
+                    board[row][i] = 0
+                break
+        # 빈 공간을 채우기 위해 다시 오른쪽으로 밀기
+        for i in range(n - 1, 0, -1):
+            if board[row][i] == 0:
+                for j in range(i - 1, -1, -1):
+                    if board[row][j] != 0:
+                        board[row][i] = board[row][j]
+                        board[row][j] = 0
                         break
-                    else:
-                        # 같으면 합체
-                        if board[row][pivot] == board[row][i]:
-                            board[row][i] = 0
-                            board[row][pivot] *= 2
-                            break
-                        else:
-                            board[row][pivot - 1] = board[row][i]
-                            board[row][i] = 0
-                            break
 
+# 왼쪽, 위, 아래 함수도 비슷하게 수정
 
-# 왼쪽
 def left(board):
     for row in range(n):
+        merged = [False] * n
         for pivot in range(n - 1):
+            if board[row][pivot] == 0:
+                continue
             for i in range(pivot + 1, n):
-                if board[row][i] != 0:
-                    if board[row][pivot] == 0:
-                        board[row][pivot] = board[row][i]
-                        board[row][i] = 0
+                if board[row][i] == 0:
+                    continue
+                if board[row][pivot] == board[row][i] and not merged[pivot]:
+                    board[row][pivot] *= 2
+                    board[row][i] = 0
+                    merged[pivot] = True
+                elif board[row][pivot] == 0:
+                    board[row][pivot] = board[row][i]
+                    board[row][i] = 0
+                break
+        for i in range(n - 1):
+            if board[row][i] == 0:
+                for j in range(i + 1, n):
+                    if board[row][j] != 0:
+                        board[row][i] = board[row][j]
+                        board[row][j] = 0
                         break
-                    else:
-                        if board[row][pivot] == board[row][i]:
-                            board[row][i] = 0
-                            board[row][pivot] *= 2
-                            break
-                        else:
-                            board[row][pivot + 1] = board[row][i]
-                            board[row][i] = 0
-                            break
 
-
-# 위
 def up(board):
     for col in range(n):
-        # 기준점
+        merged = [False] * n
         for pivot in range(n - 1):
+            if board[pivot][col] == 0:
+                continue
             for i in range(pivot + 1, n):
-                if board[i][col] != 0:
-                    # 기준점이 0이면
-                    if board[pivot][col] == 0:
-                        board[pivot][col] = board[i][col]
-                        board[i][col] = 0
+                if board[i][col] == 0:
+                    continue
+                if board[pivot][col] == board[i][col] and not merged[pivot]:
+                    board[pivot][col] *= 2
+                    board[i][col] = 0
+                    merged[pivot] = True
+                elif board[pivot][col] == 0:
+                    board[pivot][col] = board[i][col]
+                    board[i][col] = 0
+                break
+        for i in range(n - 1):
+            if board[i][col] == 0:
+                for j in range(i + 1, n):
+                    if board[j][col] != 0:
+                        board[i][col] = board[j][col]
+                        board[j][col] = 0
                         break
-                    else:
-                        # 기준점이랑 같다면
-                        if board[pivot][col] == board[i][col]:
-                            board[i][col] = 0
-                            board[pivot][col] *= 2
-                            break
-                        else:
-                            board[pivot + 1][col] = board[i][col]
-                            board[i][col] = 0
-                            break
 
-
-# 아래
 def down(board):
     for col in range(n):
-        # 기준점
-        for pivot in range(n - 1, -1, -1):
+        merged = [False] * n
+        for pivot in range(n - 1, 0, -1):
+            if board[pivot][col] == 0:
+                continue
             for i in range(pivot - 1, -1, -1):
-                if board[i][col] != 0:
-                    # 기준점이 0이면
-                    if board[pivot][col] == 0:
-                        board[pivot][col] = board[i][col]
-                        board[i][col] = 0
+                if board[i][col] == 0:
+                    continue
+                if board[pivot][col] == board[i][col] and not merged[pivot]:
+                    board[pivot][col] *= 2
+                    board[i][col] = 0
+                    merged[pivot] = True
+                elif board[pivot][col] == 0:
+                    board[pivot][col] = board[i][col]
+                    board[i][col] = 0
+                break
+        for i in range(n - 1, 0, -1):
+            if board[i][col] == 0:
+                for j in range(i - 1, -1, -1):
+                    if board[j][col] != 0:
+                        board[i][col] = board[j][col]
+                        board[j][col] = 0
                         break
-                    else:
-                        # 기준점과 같다면
-                        if board[pivot][col] == board[i][col]:
-                            board[i][col] = 0
-                            board[pivot][col] *= 2
-                            break
-                        else:
-                            board[pivot - 1][col] = board[i][col]
-                            board[i][col] = 0
-                            break
-
 
 def dfs(board, depth):
     global result
@@ -115,7 +124,6 @@ def dfs(board, depth):
     tmp = copy.deepcopy(board)
     down(tmp)
     dfs(tmp, depth + 1)
-
 
 if __name__ == '__main__':
     n = int(input())
