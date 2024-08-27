@@ -27,14 +27,14 @@ def dfs(path, depth, start):
     for i in range(start, n):
         if result == 0:
             return
-        path.append(i)
+        path.add(i)
         dfs(path, depth + 1, i + 1)
-        path.pop()
+        path.discard(i)
 
 
 if __name__ == '__main__':
     n = int(input())
     board = [list(map(int, input().split())) for _ in range(n)]
     result = math.inf
-    dfs([], 0, 0)
+    dfs(set(), 0, 0)
     print(result)
