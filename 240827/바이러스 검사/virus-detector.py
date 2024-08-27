@@ -11,6 +11,8 @@ result = 0
 for i, c in enumerate(cust):
     c -= leader
     result += 1
+    if c <= 0:
+        continue
     result += math.ceil(c / member)
 
 print(result)
