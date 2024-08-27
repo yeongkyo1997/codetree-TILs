@@ -7,6 +7,7 @@ dir = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 # 불 퍼뜨리기
 def bfs(board):
     global zero_cnt, result
+    visited = [[False] * m for _ in range(n)]
 
     q = collections.deque(fire)
     cnt = zero_cnt
@@ -16,9 +17,9 @@ def bfs(board):
         for dx, dy in dir:
             nx, ny = x + dx, y + dy
 
-            if 0 <= nx < n and 0 <= ny < m and board[nx][ny] == 0:
+            if 0 <= nx < n and 0 <= ny < m and board[nx][ny] == 0 and not visited[nx][ny]:
+                visited[nx][ny] = True
                 q.append((nx, ny))
-                board[nx][ny] = 2
                 cnt -= 1
     result = max(cnt, result)
 
@@ -31,14 +32,13 @@ def dfs(board, depth, row, col):
 
     for i in range(row, n):
         for j in range(col, m):
-            tmp = copy.deepcopy(board)
-            if tmp[i][j] == 0:
-                tmp[i][j] = 1
+            if board[i][j] == 0:
+                board[i][j] = 1
                 if j == m - 1:
-                    dfs(tmp, depth + 1, row + 1, 0)
+                    dfs(board, depth + 1, row + 1, 0)
                 else:
-                    dfs(tmp, depth + 1, row, col + 1)
-                tmp[i][j] = 0
+                    dfs(board, depth + 1, row, col + 1)
+                board[i][j] = 0
         col = 0
 
 
