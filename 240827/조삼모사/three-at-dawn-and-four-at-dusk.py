@@ -1,4 +1,7 @@
 import math
+import sys
+
+input = lambda: sys.stdin.readline().rstrip()
 
 
 def dfs(path, depth, start):
