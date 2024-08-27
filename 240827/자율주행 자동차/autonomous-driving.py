@@ -20,7 +20,7 @@ def move(x, y, d):
             dx, dy = dir[d]
             x -= dx
             y -= dy
-            if 0 <= x < n and 0 <= y < m:
+            if 0 <= x < n and 0 <= y < m and board[x][y] != 1:
                 continue
             else:
                 return ret
