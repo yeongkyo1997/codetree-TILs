@@ -40,7 +40,7 @@ def bfs(rx, ry, bx, by):
     while q:
         rx, ry, bx, by, depth = q.popleft()
 
-        if depth > 10:
+        if depth >= 10:
             return -1
 
         for d in range(len(dir)):
