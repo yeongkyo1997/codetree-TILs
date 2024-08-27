@@ -25,6 +25,8 @@ def dfs(path, depth, start):
         return
 
     for i in range(start, n):
+        if result == 0:
+            return
         dfs(path | {i}, depth + 1, i + 1)
 
 
