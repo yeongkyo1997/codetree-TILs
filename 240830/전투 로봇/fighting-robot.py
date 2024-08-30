@@ -9,6 +9,7 @@ def kill_pos():
     visited[rx][ry] = True
     q = collections.deque()
     q.append((rx, ry, 0))
+    candi = []
 
     while q:
         x, y, depth = q.popleft()
@@ -27,15 +28,20 @@ def kill_pos():
                     if board[nx][ny] == 0:
                         q.append((nx, ny, depth + 1))
                     else:
-                        exp += 1
-                        board[nx][ny] = 0
-                        if exp == robot_level:
-                            robot_level += 1
-                            exp = 0
-                        return nx, ny, depth + 1
+                        candi.append((depth + 1, nx, ny))
 
-    # 없앨 수 있는 몬스터가 없다면
-    return -1, -1, 0
+    if candi:
+        candi.sort(key=lambda x: (x[0], x[1], x[2]))
+        depth, nx, ny = candi[0]
+        exp += 1
+        board[nx][ny] = 0
+        if exp == robot_level:
+            robot_level += 1
+            exp = 0
+        return nx, ny, depth
+    else:
+        # 없앨 수 있는 몬스터가 없다면
+        return -1, -1, 0
 
 
 if __name__ == '__main__':
