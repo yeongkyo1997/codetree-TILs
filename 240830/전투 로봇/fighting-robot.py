@@ -13,6 +13,8 @@ def kill_pos():
 
     while q:
         x, y, depth = q.popleft()
+        if candi and candi[0][0] <= depth:
+            break
 
         for dx, dy in dir:
             nx, ny = x + dx, y + dy
