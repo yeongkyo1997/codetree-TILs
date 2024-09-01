@@ -1,5 +1,8 @@
 import collections
 import copy
+import sys
+
+input = lambda: sys.stdin.readline().rstrip()
 
 
 def bfs(board, zero_cnt):
