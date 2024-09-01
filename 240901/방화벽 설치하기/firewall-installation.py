@@ -5,7 +5,7 @@ import sys
 input = lambda: sys.stdin.readline().rstrip()
 
 
-def bfs(board, zero_cnt):
+def bfs(board, wall, zero_cnt):
     q = collections.deque(fire)
     visited = [[False] * m for _ in range(n)]
 
@@ -18,33 +18,22 @@ def bfs(board, zero_cnt):
         for dx, dy in dir:
             nx, ny = x + dx, y + dy
 
-            if 0 <= nx < n and 0 <= ny < m and board[nx][ny] == 0 and not visited[nx][ny]:
+            if 0 <= nx < n and 0 <= ny < m and board[nx][ny] == 0 and not visited[nx][ny] and (nx, ny) not in wall:
                 visited[nx][ny] = True
                 q.append((nx, ny))
                 zero_cnt -= 1
 
-    return zero_cnt
+    return zero_cnt - 3
 
 
-def dfs(path, depth, row, col):
+def dfs(wall, depth, start):
     global result
     if depth == 3:
-        tmp = copy.deepcopy(board)
-        for px, py in path:
-            tmp[px][py] = 1
-        result = max(result, bfs(tmp, zero_cnt))
-
+        result = max(result, bfs(board, wall, len(zero)))
         return
 
-    for r in range(row, n):
-        for c in range(col, m):
-            path.append((r, c))
-            if c == m - 1:
-                dfs(path, depth + 1, row + 1, 0)
-            else:
-                dfs(path, depth + 1, row, col + 1)
-            path.pop()
-        col = 0
+    for i in range(start, len(zero)):
+        dfs(wall | {(zero[i])}, depth + 1, i + 1)
 
 
 if __name__ == '__main__':
@@ -52,15 +41,15 @@ if __name__ == '__main__':
     n, m = map(int, input().split())
     board = [list(map(int, input().split())) for _ in range(n)]
     fire = []
-    zero_cnt = -3
+    zero = []
 
     for i in range(n):
         for j in range(m):
             if board[i][j] == 2:
                 fire.append((i, j))
             if board[i][j] == 0:
-                zero_cnt += 1
+                zero.append((i, j))
 
     result = 0
-    dfs([], 0, 0, 0)
+    dfs(set(), 0, 0)
     print(result)
