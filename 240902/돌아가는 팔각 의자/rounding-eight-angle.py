@@ -1,8 +1,9 @@
 import collections
+import copy
 
 
 def rotate(n, d):
-    tmp = [b[:] for b in board]
+    tmp = [copy.copy(b) for b in board]
     board[n].rotate(d)
 
     nn, nd = n, d
