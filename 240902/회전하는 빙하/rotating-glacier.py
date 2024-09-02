@@ -41,7 +41,7 @@ def melting():
                 cnt += 1
         return cnt >= 3
 
-    tmp = copy.deepcopy(board)
+    tmp = [row[:] for row in board]
     for i in range(board_size):
         for j in range(board_size):
             if tmp[i][j] != 0 and not check(i, j):
@@ -53,7 +53,7 @@ def rotate(row, col, size):
     if size == (1 << L):
         mid = size // 2
         # 회전
-        origin_board = copy.deepcopy(board)
+        origin_board = [row[:] for row in board]
 
         # 3->2
         for i in range(mid):
