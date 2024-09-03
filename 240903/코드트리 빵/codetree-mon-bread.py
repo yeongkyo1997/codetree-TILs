@@ -8,7 +8,7 @@ def bfs():
 
     while people:
         t, x, y, idx = heapq.heappop(people)
-        if len(people) == len(finished_people):
+        if m == len(finished_people):
             break
         if idx in finished_people:
             continue
