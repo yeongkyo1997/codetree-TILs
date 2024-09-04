@@ -1,6 +1,6 @@
 import sys
 
-# sys.stdin = open('input.txt', 'r')
+sys.stdin = open('input.txt', 'r')
 
 
 # 영역 회전시키기
@@ -104,9 +104,9 @@ if __name__ == '__main__':
     result = 0
     for _ in range(K):
         move()
-        x, y, size, candi = find_area()
-        rotate(x, y, size, candi)
         if not people:
             break
+        x, y, size, candi = find_area()
+        rotate(x, y, size, candi)
     print(result)
     print(ex + 1, ey + 1)
