@@ -1,8 +1,6 @@
 import collections
 import sys
 
-# sys.stdin = open('포탑 부수기.txt', 'r')
-
 
 # 공격자 선정
 def choose_attacker():
@@ -21,22 +19,30 @@ def choose_attacker():
 
 
 # 레이저 공격
-def laser_attack(x, y, ex, ey):
+def laser_attack(sx, sy, ex, ey):
     dir = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     q = collections.deque()
-    q.append((x, y, {(x, y)}))
-
+    q.append((sx, sy))
+    visited = [[False] * M for _ in range(N)]
+    visited[sx][sy] = True
+    prev = [[None] * M for _ in range(N)]
     while q:
-        x, y, path = q.popleft()
+        x, y = q.popleft()
         if (x, y) == (ex, ey):
+            path = []
+            while (x, y) != (sx, sy):
+                path.append((x, y))
+                x, y = prev[x][y]
             return path
 
         for dx, dy in dir:
             # 모듈러 연산자를 사용해서 끝에서 끝으로 이동시키기
             nx, ny = (x + dx) % N, (y + dy) % M
 
-            if board[nx][ny] != 0 and (nx, ny) not in path:
-                q.append((nx, ny, path | {(nx, ny)}))
+            if board[nx][ny] != 0 and (nx, ny) and not visited[nx][ny]:
+                visited[nx][ny] = True
+                prev[nx][ny] = (x, y)
+                q.append((nx, ny))
 
     return None
 
@@ -76,8 +82,9 @@ if __name__ == '__main__':
         attacked[x][y] = True
         path = laser_attack(x, y, ex, ey)
         if path:
-            path -= {(x, y)}
             for px, py in path:
+                if (x, y) == (px, py):
+                    continue
                 if (px, py) == (ex, ey):
                     board[px][py] = max(0, board[px][py] - board[x][y])
                 else:
