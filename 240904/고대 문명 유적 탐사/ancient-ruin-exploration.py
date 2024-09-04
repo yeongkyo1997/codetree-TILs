@@ -1,7 +1,7 @@
 import collections
 import sys
 
-sys.stdin = open('input.txt', 'r')
+# sys.stdin = open('input.txt', 'r')
 
 
 # 격자 선택하기
