@@ -67,12 +67,15 @@ if __name__ == '__main__':
     # 공격 시간
     attack_times = [[0] * M for _ in range(N)]
 
-    for _ in range(K):
+    for i in range(K):
         x, y, ex, ey = choose_attacker()
+        if (x, y) == (ex, ey):
+            break
         board[x][y] += N + M
         attacked = [[False] * M for _ in range(N)]
         attacked[x][y] = True
         path = laser_attack(x, y, ex, ey)
+
         if path:
             path -= {(x, y)}
             for px, py in path:
@@ -92,7 +95,7 @@ if __name__ == '__main__':
                 else:
                     board[px][py] = max(0, board[px][py] - board[x][y] // 2)
                 attacked[px][py] = True
-        attack_times[x][y] = K
+        attack_times[x][y] = i
         fix_turret()
     result = 0
     for i in range(N):
