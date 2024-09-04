@@ -1,7 +1,7 @@
 import collections
 import sys
 
-# sys.stdin = open('input.txt', 'r')
+sys.stdin = open('input.txt', 'r')
 
 
 # 격자 선택하기
@@ -151,16 +151,16 @@ if __name__ == '__main__':
     N = 5
     board = [list(map(int, input().split())) for _ in range(N)]
     arr = list(map(int, input().split()))
-    result = 0
 
-    idx = 0
     for _ in range(K):
+        result = 0
+        idx = 0
         board = choose()
         if not board:
             break
         while True:
+            remove()
             if not is_zero():
-                remove()
+                print(result, end=' ')
                 break
             fill()
-    print(result)
