@@ -1,6 +1,6 @@
 import sys
 
-sys.stdin = open('input.txt', 'r')
+# sys.stdin = open('input.txt', 'r')
 
 
 # 영역 회전시키기
