@@ -2,8 +2,6 @@ import collections
 import math
 import sys
 
-sys.stdin = open('Main_20058', 'r')
-
 
 # 마법 시전
 def firestorm(row, col, size):
