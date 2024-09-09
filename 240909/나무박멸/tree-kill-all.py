@@ -1,4 +1,5 @@
 import math
+import sys
 
 
 # 나무 성장
@@ -67,17 +68,19 @@ def remove():
                 if max_val < val:
                     max_val = val
                     rx, ry = x, y
+    if (rx, ry) == (-1, -1):
+        return
     result += board[rx][ry]
     board[rx][ry] = 0
-    death[rx][ry] = K
+    death[rx][ry] = C + 1
     for dx, dy in dir:
         for i in range(1, K + 1):
             nx, ny = rx + dx * i, ry + dy * i
             if 0 <= nx < N and 0 <= ny < N and board[nx][ny] != -1:
                 if board[nx][ny] == 0:
-                    death[nx][ny] = K
+                    death[nx][ny] = C + 1
                     break
-                death[nx][ny] = K
+                death[nx][ny] = C + 1
                 result += board[nx][ny]
                 board[nx][ny] = 0
             else:
@@ -98,7 +101,7 @@ if __name__ == '__main__':
     death = [[0] * N for _ in range(N)]
 
     result = 0
-    for _ in range(M):
+    for i in range(M):
         reduce()
         grow()
         spread()
