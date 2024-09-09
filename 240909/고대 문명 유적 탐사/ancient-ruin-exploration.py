@@ -120,5 +120,5 @@ if __name__ == '__main__':
             fill()
             result += cnt
             if cnt == 0:
-                print(result)
+                print(result, end=' ')
                 break
