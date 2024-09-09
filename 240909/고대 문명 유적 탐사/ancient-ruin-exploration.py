@@ -40,8 +40,8 @@ def rotate():
     next_board = None
     max_val = 0
     for i in range(3):
-        for x in range(N - 2):
-            for y in range(N - 2):
+        for y in range(N - 2):
+            for x in range(N - 2):
                 tmp = [b[:] for b in board]
                 if i == 0:
                     rotate_90(tmp, x, y)
@@ -106,10 +106,11 @@ if __name__ == '__main__':
     board = [list(map(int, input().split())) for _ in range(N)]
     pieces = list(map(int, input().split()))
     idx = 0
-    for _ in range(K):
+    for i in range(K):
         result = 0
         cnt = rotate()
-
+        if not board:
+            break
         if cnt == 0:
             break
         result += cnt
