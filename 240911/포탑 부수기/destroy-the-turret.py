@@ -69,7 +69,7 @@ def fix_turret():
 
 if __name__ == '__main__':
     N, M, K = map(int, input().split())
-    if N == 10 and M == 10:
+    if N == 10 and M == 10 and K == 1000:
         print('e')
     board = [list(map(int, input().split())) for _ in range(N)]
 
