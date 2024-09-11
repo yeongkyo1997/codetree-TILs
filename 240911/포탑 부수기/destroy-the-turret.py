@@ -1,6 +1,7 @@
 import collections
 import sys
 
+sys.stdin = open('포탑 부수기', 'r')
 
 
 # 공격자 선정
@@ -15,8 +16,7 @@ def find():
     sx, sy = candi[0][-1]
     ex, ey = candi[-1][-1]
 
-    # 공격자 공격력 올리기
-    board[sx][sy] += N + M
+
 
     return sx, sy, ex, ey
 
@@ -102,6 +102,8 @@ if __name__ == '__main__':
         sx, sy, ex, ey = find()
         if (sx, sy) == (ex, ey):
             break
+        # 공격자 공격력 올리기
+        board[sx][sy] += N + M
         # 공격자 공격시간
         attack_time[sx][sy] = i
         if not lazer(sx, sy, ex, ey):
