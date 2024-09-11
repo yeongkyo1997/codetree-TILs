@@ -24,7 +24,6 @@ def move(idx, d):
                     # 나이트가 없다면 후보가 될 수 없다
                     if not knights[nx][ny]:
                         continue
-
                     # 다음 이동과 인덱스가 같다면 무조건 추가
                     if idx == knights[nx][ny]:
                         candi.append((nx, ny))
@@ -48,7 +47,7 @@ def move(idx, d):
                         if 0 <= cx + dx < L and 0 <= cy + dy < L:
                             tmp[cx + dx][cy + dy] = knights[cx][cy]
                             is_moved.add(knights[cx][cy])
-                            knights[cx][cy] = 0
+                            tmp[cx][cy] = 0
                         else:
                             return False
                     for x in range(L):
