@@ -47,7 +47,10 @@ def move(idx, d):
                     for cx, cy in candi:
                         if 0 <= cx + dx < L and 0 <= cy + dy < L:
                             tmp[cx + dx][cy + dy] = knights[cx][cy]
+                            is_attacked.add(knights[cx][cy])
                             knights[cx][cy] = 0
+                        else:
+                            return False
                     for x in range(L):
                         for y in range(L):
                             if tmp[x][y]:
@@ -55,14 +58,14 @@ def move(idx, d):
                             if knights[x][y]:
                                 tmp[x][y] = knights[x][y]
                     knights = tmp
-                return
+                return True
 
 
 # 데미지 입히기
 def damage():
     for i in range(L):
         for j in range(L):
-            if board[i][j] == 1 and knights[i][j]:
+            if board[i][j] == 1 and knights[i][j] and knights[i][j] in is_attacked:
                 if knights[i][j] == idx:
                     continue
                 damaged[knights[i][j]] += 1
@@ -77,13 +80,9 @@ def damage():
 
 # 살아있는 기사가 받은 데미지 계산하기
 def calc():
-    ret = 0
+    global result
     for i in range(1, N + 1):
-        ret += damaged[i]
-
-    return ret
-
-
+        result += damaged[i]
 
 
 if __name__ == '__main__':
@@ -95,6 +94,7 @@ if __name__ == '__main__':
     knights = [[0] * L for _ in range(L)]
     damaged = collections.defaultdict(int)
     power = collections.defaultdict(int)
+
     for idx in range(1, N + 1):
         r, c, h, w, k = map(int, input().split())
         r, c = map(lambda x: x - 1, (r, c))
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     result = 0
     for _ in range(Q):
         idx, d = map(int, input().split())
-        move(idx, d)
-        damage()
-    result = calc()
+        is_attacked = set()
+        if move(idx, d):
+            damage()
     print(result)
