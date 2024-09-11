@@ -47,7 +47,7 @@ def move(idx, d):
                     for cx, cy in candi:
                         if 0 <= cx + dx < L and 0 <= cy + dy < L:
                             tmp[cx + dx][cy + dy] = knights[cx][cy]
-                            is_attacked.add(knights[cx][cy])
+                            is_moved.add(knights[cx][cy])
                             knights[cx][cy] = 0
                         else:
                             return False
@@ -58,14 +58,14 @@ def move(idx, d):
                             if knights[x][y]:
                                 tmp[x][y] = knights[x][y]
                     knights = tmp
-                return True
+                    return True
 
 
 # 데미지 입히기
 def damage():
     for i in range(L):
         for j in range(L):
-            if board[i][j] == 1 and knights[i][j] and knights[i][j] in is_attacked:
+            if board[i][j] == 1 and knights[i][j] in is_moved:
                 if knights[i][j] == idx:
                     continue
                 damaged[knights[i][j]] += 1
@@ -73,9 +73,10 @@ def damage():
 
     for i in range(L):
         for j in range(L):
-            if power[knights[i][j]] <= 0:
-                knights[i][j] = 0
-                damaged[knights[i][j]] = 0
+            if knights[i][j]:
+                if power[knights[i][j]] <= 0:
+                    damaged[knights[i][j]] = 0
+                    knights[i][j] = 0
 
 
 # 살아있는 기사가 받은 데미지 계산하기
@@ -106,7 +107,8 @@ if __name__ == '__main__':
     result = 0
     for _ in range(Q):
         idx, d = map(int, input().split())
-        is_attacked = set()
+        is_moved = set()
         if move(idx, d):
             damage()
+    calc()
     print(result)
