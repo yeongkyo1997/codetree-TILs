@@ -1,6 +1,5 @@
 import collections
 import sys
-from pprint import pprint
 
 # sys.stdin = open('왕실의 기사 대결', 'r')
 
@@ -43,11 +42,12 @@ def move(idx, d):
             if knights[i][j] == idx:
                 candi = bfs(i, j, idx, d)
                 if candi:
-                    tmp = [[None for _ in range(L)] for _ in range(L)]
+                    tmp = [[0] * L for _ in range(L)]
                     dx, dy = dir[d]
                     for cx, cy in candi:
-                        tmp[cx + dx][cy + dy] = knights[cx][cy]
-                        knights[cx][cy] = 0
+                        if 0 <= cx + dx < L and 0 <= cy + dy < L:
+                            tmp[cx + dx][cy + dy] = knights[cx][cy]
+                            knights[cx][cy] = 0
                     for x in range(L):
                         for y in range(L):
                             if tmp[x][y]:
@@ -82,6 +82,8 @@ def calc():
         ret += damaged[i]
 
     return ret
+
+
 
 
 if __name__ == '__main__':
