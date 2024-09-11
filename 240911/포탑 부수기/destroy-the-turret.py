@@ -1,8 +1,6 @@
 import collections
 import sys
 
-sys.stdin = open('포탑 부수기', 'r')
-
 
 # 공격자 선정
 def find():
