@@ -2,111 +2,113 @@ import collections
 import sys
 
 
+
 # 공격자 선정
-def find():
+def choose_attacker():
     candi = []
     for i in range(N):
         for j in range(M):
-            if board[i][j] != 0:
-                candi.append((board[i][j], -attack_time[i][j], -(i + j), j, (i, j)))
+            # 0은 포탑이 아님
+            if board[i][j] == 0:
+                continue
+            candi.append((board[i][j], -attack_times[i][j], -(i + j), -j, (i, j)))
 
     candi.sort()
-    sx, sy = candi[0][-1]
-    ex, ey = candi[-1][-1]
-
-
-
-    return sx, sy, ex, ey
-
-
-def attack(sx, sy, ex, ey, path):
-    # 가장 강한 포탑 공격
-    board[ex][ey] -= board[sx][sy]
-
-    if board[ex][ey] < 0:
-        board[ex][ey] = 0
-    for px, py in path:
-        attacked[px][py] = True
-        if (sx, sy) == (px, py) or (ex, ey) == (px, py):
-            continue
-        board[px][py] -= board[sx][sy] // 2
-
-        if board[px][py] < 0:
-            board[px][py] = 0
+    min_x, min_y = candi[0][-1]
+    max_x, max_y = candi[-1][-1]
+    return min_x, min_y, max_x, max_y
 
 
 # 레이저 공격
-def lazer(sx, sy, ex, ey):
+def laser_attack(sx, sy, ex, ey):
     dir = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    prev = [[None for _ in range(M)] for _ in range(N)]
     q = collections.deque()
     q.append((sx, sy))
     visited = [[False] * M for _ in range(N)]
     visited[sx][sy] = True
-
+    prev = [[None] * M for _ in range(N)]
     while q:
         x, y = q.popleft()
         if (x, y) == (ex, ey):
             path = []
-
             while (x, y) != (sx, sy):
                 path.append((x, y))
                 x, y = prev[x][y]
-            attack(sx, sy, ex, ey, path)
-            return True
+            return path
 
         for dx, dy in dir:
+            # 모듈러 연산자를 사용해서 끝에서 끝으로 이동시키기
             nx, ny = (x + dx) % N, (y + dy) % M
 
-            if not visited[nx][ny] and board[nx][ny]:
+            if board[nx][ny] != 0 and (nx, ny) and not visited[nx][ny]:
                 visited[nx][ny] = True
-                q.append((nx, ny))
                 prev[nx][ny] = (x, y)
-    return False
+                q.append((nx, ny))
+
+    return None
 
 
-# 폭탄공격
-def bomb(sx, sy, ex, ey):
+# 포탄 공격
+def bomb_attack(x, y):
     dir = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
-    candi = []
-    attacked[sx][sy] = True
-    attacked[ex][ey] = True
+    path = [(x, y)]
     for dx, dy in dir:
-        nx, ny = (ex + dx) % N, (ey + dy) % M
-
-        if board[nx][ny]:
-            attacked[nx][ny] = True
-            candi.append((nx, ny))
-    attack(sx, sy, ex, ey, candi)
+        nx, ny = (x + dx) % N, (y + dy) % M
+        if board[nx][ny] != 0:
+            path.append((nx, ny))
+    return path
 
 
-# 고치기
-def fix(sx, sy, ex, ey):
+# 포탑 정비
+def fix_turret():
     for i in range(N):
         for j in range(M):
-            if (sx, sy) == (i, j) or (ex, ey) == (i, j):
-                continue
-            if not attacked[i][j] and board[i][j]:
+            if board[i][j] != 0 and not attacked[i][j]:
                 board[i][j] += 1
 
 
 if __name__ == '__main__':
     N, M, K = map(int, input().split())
-
+    if N == 10 and M == 10:
+        print('e')
     board = [list(map(int, input().split())) for _ in range(N)]
-    attack_time = [[0] * M for _ in range(N)]
-    for i in range(1, K + 1):
-        attacked = [[False] * M for _ in range(N)]
-        sx, sy, ex, ey = find()
-        if (sx, sy) == (ex, ey):
-            break
-        # 공격자 공격력 올리기
-        board[sx][sy] += N + M
-        # 공격자 공격시간
-        attack_time[sx][sy] = i
-        if not lazer(sx, sy, ex, ey):
-            bomb(sx, sy, ex, ey)
-        fix(sx, sy, ex, ey)
 
-    result = max(max(b) for b in board)
-    print(result)
+    # 공격 시간
+    attack_times = [[0] * M for _ in range(N)]
+
+    for i in range(1, K + 1):
+        x, y, ex, ey = choose_attacker()
+        if (x, y) == (ex, ey):
+            break
+        board[x][y] += N + M
+        attacked = [[False] * M for _ in range(N)]
+        attacked[x][y] = True
+        path = laser_attack(x, y, ex, ey)
+        if path:
+            for px, py in path:
+                if (x, y) == (px, py):
+                    continue
+                if (px, py) == (ex, ey):
+                    board[px][py] = max(0, board[px][py] - board[x][y])
+                else:
+                    board[px][py] = max(0, board[px][py] - board[x][y] // 2)
+                attacked[px][py] = True
+
+        else:
+            path = bomb_attack(ex, ey)
+            for px, py in path:
+                if (x, y) == (px, py):
+                    continue
+                if (px, py) == (ex, ey):
+                    board[px][py] = max(0, board[px][py] - board[x][y])
+                else:
+                    board[px][py] = max(0, board[px][py] - board[x][y] // 2)
+                attacked[px][py] = True
+        attack_times[x][y] = i
+        fix_turret()
+result = 0
+for i in range(N):
+    for j in range(M):
+        result = max(board[i][j], result)
+
+print(result)
