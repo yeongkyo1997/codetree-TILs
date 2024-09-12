@@ -1,7 +1,6 @@
 import collections
 import sys
 
-sys.stdin = open('색깔 폭탄', 'r')
 
 
 # 터뜨릴 폭탄 묶음 찾고 터뜨리기
