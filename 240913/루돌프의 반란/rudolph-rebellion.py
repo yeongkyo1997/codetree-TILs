@@ -1,6 +1,7 @@
 import collections
 import sys
 
+# sys.stdin = open('루돌프의 반란', 'r')
 
 
 # 거리
@@ -141,6 +142,14 @@ def minus():
             santa_stun[key] -= 1
 
 
+# 산타가 전부 탈락했는지 확인
+def is_fail():
+    for key in santa.keys():
+        if is_valid_santa(key):
+            return False
+    return True
+
+
 if __name__ == '__main__':
     dir8 = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
     dir4 = [(-1, 0), (0, 1), (1, 0), (0, -1)]
@@ -168,6 +177,8 @@ if __name__ == '__main__':
         move_S()
         plus()
         minus()
+        if is_fail():
+            break
 
     for i in range(1, P + 1):
         print(santa_score[i], end=' ')
