@@ -69,12 +69,13 @@ def remove():
     for dx, dy in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
         for size in range(1, K + 1):
             nx, ny = x + dx * size, y + dy * size
-            if 0 <= nx < N and 0 <= ny < N and board[nx][ny] > 0:
+            if 0 <= nx < N and 0 <= ny < N:
+                if board[nx][ny] <= 0:
+                    death[nx][ny] = C + 1
+                    break
                 ret += board[nx][ny]
                 board[nx][ny] = 0
                 death[nx][ny] = C + 1
-            else:
-                break
 
     return ret
 
@@ -83,7 +84,7 @@ def remove():
 def reduce():
     for i in range(N):
         for j in range(N):
-            death[i][j] = max(0, death[i][j])
+            death[i][j] = max(0, death[i][j] - 1)
 
 
 if __name__ == '__main__':
