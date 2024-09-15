@@ -27,9 +27,7 @@ def rotate():
             for j in range(size):
                 tmp[i][j] = board[i + row][j + col]
 
-        tmp = list(map(list, zip(*tmp[::-1])))
-        tmp = list(map(list, zip(*tmp[::-1])))
-
+        tmp = list(map(list, zip(*tmp[::-1])))[::-1]
 
         for i in range(size):
             for j in range(size):
@@ -42,9 +40,7 @@ def rotate():
             for j in range(size):
                 tmp[i][j] = board[i + row][j + col]
 
-        tmp = list(map(list, zip(*tmp[::-1])))
-        tmp = list(map(list, zip(*tmp[::-1])))
-        tmp = list(map(list, zip(*tmp[::-1])))
+        tmp = list(map(list, zip(*tmp)))[::-1]
 
         for i in range(size):
             for j in range(size):
