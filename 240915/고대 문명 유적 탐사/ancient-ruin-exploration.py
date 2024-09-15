@@ -27,7 +27,7 @@ def rotate():
             for j in range(size):
                 tmp[i][j] = board[i + row][j + col]
 
-        tmp = [row[::-1] for row in tmp[::-1]]
+        tmp = list(map(lambda x: x[::-1], tmp[::-1]))
 
         for i in range(size):
             for j in range(size):
