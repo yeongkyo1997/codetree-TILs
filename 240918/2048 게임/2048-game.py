@@ -25,6 +25,7 @@ def up(board):
                     # 기준이 0이 아니라면 움직이려는 값 다음 칸으로 이동
                     else:
                         board[pivot + 1][col], board[row][col] = board[row][col], board[pivot + 1][col]
+                    break
 
 
 # 하
@@ -49,6 +50,7 @@ def down(board):
                     # 기준이 0이 아니라면 움직이려는 값 다음 칸으로 이동
                     else:
                         board[pivot - 1][col], board[row][col] = board[row][col], board[pivot - 1][col]
+                    break
 
 
 # 좌
@@ -72,6 +74,7 @@ def left(board):
                     # 기준이 0이 아니라면 움직이려는 값 다음 칸으로 이동
                     else:
                         board[row][pivot + 1], board[row][col] = board[row][col], board[row][pivot + 1]
+                    break
 
 
 # 우
@@ -94,6 +97,7 @@ def right(board):
                     # 기준이 0이 아니라면 움직이려는 값 다음 칸으로 이동
                     else:
                         board[row][pivot - 1], board[row][col] = board[row][col], board[row][pivot - 1]
+                    break
 
 
 # 방향 dfs
