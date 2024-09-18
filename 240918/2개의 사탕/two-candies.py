@@ -23,13 +23,13 @@ def move_cnt(x, y, d):
 
 
 # 10번 dfs
-def dfs(rx, ry, bx, by, depth):
+def dfs(rx, ry, bx, by, visited, depth):
     global result
     if depth == 10:
         return
-
-    if depth >= result:
+    if (rx, ry, bx, by) in visited:
         return
+
     # 움직일 방향 선택하기
     for d in range(4):
         # 파란 구슬 움직이기
@@ -37,11 +37,12 @@ def dfs(rx, ry, bx, by, depth):
 
         # 파란 구슬이 나간 경우
         if (nbx, nby) == (ox, oy):
-            return
+            continue
 
         # 빨간 구슬 움직이기
         nrx, nry, r_cnt = move_cnt(rx, ry, d)
 
+        # 빨간 구슬이 나간 경우
         if (nrx, nry) == (ox, oy):
             result = min(depth + 1, result)
             return
@@ -56,8 +57,7 @@ def dfs(rx, ry, bx, by, depth):
             else:  # 빨간 구슬이 더 많이 움직인 경우
                 nrx -= dx
                 nry -= dy
-
-        dfs(nrx, nry, nbx, nby, depth + 1)
+        dfs(nrx, nry, nbx, nby, visited | {(rx, ry, bx, by)}, depth + 1)
 
 
 if __name__ == '__main__':
@@ -77,9 +77,8 @@ if __name__ == '__main__':
                 rx, ry = i, j
             elif board[i][j] == 'O':
                 ox, oy = i, j
-    visited = set()
     result = math.inf
-    dfs(rx, ry, bx, by, 0)
+    dfs(rx, ry, bx, by, set(), 0)
     if result == math.inf:
         result = -1
     print(result)
