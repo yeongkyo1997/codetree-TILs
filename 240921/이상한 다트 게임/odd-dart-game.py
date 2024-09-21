@@ -25,7 +25,7 @@ def remove():
     # 인접한 숫자 있는지 확인
     def check(board, x, y, num):
         for dx, dy in dir:
-            nx, ny = x + dx, (y + dy) % N
+            nx, ny = x + dx, (y + dy) % M
             if 0 <= nx < N and board[nx][ny] == num:
                 return True
         return False
@@ -33,7 +33,7 @@ def remove():
     tmp = copy.deepcopy(board)
     flag = False
     for i in range(N):
-        for j in range(N):
+        for j in range(M):
             if board[i][j] == -1:
                 continue
             if check(board, i, j, board[i][j]):
@@ -48,7 +48,7 @@ def normalization():
     total = 0
     cnt = 0
     for i in range(N):
-        for j in range(N):
+        for j in range(M):
             if board[i][j] != -1:
                 cnt += 1
                 total += board[i][j]
@@ -56,7 +56,7 @@ def normalization():
     mean = total // cnt
 
     for i in range(N):
-        for j in range(N):
+        for j in range(M):
             if board[i][j] == -1:
                 continue
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     result = 0
     for i in range(N):
-        for j in range(N):
+        for j in range(M):
             if board[i][j] == -1:
                 continue
             result += board[i][j]
