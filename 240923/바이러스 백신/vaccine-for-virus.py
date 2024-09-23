@@ -7,21 +7,25 @@ import sys
 
 def bfs(path):
     dir = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-    ret = 0
-    visited = set()
+    visited = set(path)
     q = collections.deque(map(lambda x: (x[0], x[1], 0), path))
+    cnt = 0
 
     while q:
         x, y, depth = q.popleft()
-        ret = max(depth, ret)
 
         for dx, dy in dir:
             nx, ny = x + dx, y + dy
 
-            if 0 <= nx < N and 0 <= ny < N and board[nx][ny] == 0 and (nx, ny) not in visited:
+            if 0 <= nx < N and 0 <= ny < N and board[nx][ny] != -1 and (nx, ny) not in visited:
                 visited.add((nx, ny))
                 q.append((nx, ny, depth + 1))
-    return ret if len(visited) == zero_cnt else math.inf
+                if board[nx][ny] == 0:
+                    cnt += 1
+                    if cnt == zero_cnt:
+                        return depth + 1
+
+    return -1
 
 
 # 병원 고르기
