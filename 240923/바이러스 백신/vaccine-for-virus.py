@@ -2,7 +2,6 @@ import collections
 import math
 import sys
 
-# sys.stdin = open('바이러스 백신', 'r')
 
 
 def bfs(path):
@@ -25,7 +24,7 @@ def bfs(path):
                     if cnt == zero_cnt:
                         return depth + 1
 
-    return -1
+    return math.inf
 
 
 # 병원 고르기
@@ -49,5 +48,7 @@ if __name__ == '__main__':
                 hospitals.append((i, j))
             elif board[i][j] == 0:
                 zero_cnt += 1
-    result = dfs([], 0, 0)
+    result = 0
+    if zero_cnt != 0:
+        result = dfs([], 0, 0)
     print(result if result != math.inf else -1)
