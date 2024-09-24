@@ -2,7 +2,6 @@ import collections
 import math
 import sys
 
-# sys.stdin = open('마법의 숲 탐색', 'r')
 
 
 # 골램 내리기
@@ -79,14 +78,13 @@ def bfs(x, y, val):
         for dx, dy in dir:
             nx, ny = x + dx, y + dy
 
-            if 0 <= nx < R + 3 and 0 <= ny < C and visited[x][y] + 1 <= visited[nx][ny] and board[nx][ny] != 0:
+            if 0 <= nx < R + 3 and 0 <= ny < C and visited[x][y] + 1 < visited[nx][ny] and board[nx][ny] != 0:
                 # 번호라면 이동가능
                 if abs(board[nx][ny]) == val:
                     visited[nx][ny] = visited[x][y] + 1
                     q.append((nx, ny, val))
                 # 번호는 다르지만 출구인 경우
                 elif board[x][y] == -val:
-
                     visited[nx][ny] = visited[x][y] + 1
                     q.append((nx, ny, abs(board[nx][ny])))
     return ret
