@@ -1,8 +1,6 @@
 import collections
-import math
 import sys
 
-# sys.stdin = open('자율주행 전기차', 'r')
 
 
 def find_start():
@@ -26,6 +24,8 @@ def find_start():
 
                 q.append((nx, ny, depth + 1))
     candi.sort()
+    if not candi:
+        return -1
     x, y, dist = candi[0][-1]
     idx = starts_lib[x, y]
     starts_set.add((x, y))
