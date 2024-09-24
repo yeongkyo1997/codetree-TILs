@@ -69,26 +69,26 @@ def move_down(col, d):
 def bfs(x, y, val):
     q = collections.deque()
     visited = [[math.inf] * C for _ in range(R + 3)]
-    q.append((x, y))
+    q.append((x, y, val))
     ret = x - 3 + 1
     visited[x][y] = 1
 
     while q:
-        x, y = q.popleft()
+        x, y, val = q.popleft()
         ret = max(ret, x - 3 + 1)
         for dx, dy in dir:
             nx, ny = x + dx, y + dy
 
-            if 0 <= nx < R + 3 and 0 <= ny < C and visited[x][y] <= visited[nx][ny] and board[nx][ny] != 0:
+            if 0 <= nx < R + 3 and 0 <= ny < C and visited[x][y] + 1 <= visited[nx][ny] and board[nx][ny] != 0:
                 # 번호라면 이동가능
                 if abs(board[nx][ny]) == val:
                     visited[nx][ny] = visited[x][y] + 1
-                    q.append((nx, ny))
+                    q.append((nx, ny, val))
                 # 번호는 다르지만 출구인 경우
                 elif board[x][y] == -val:
-                    val = abs(board[nx][ny])
+
                     visited[nx][ny] = visited[x][y] + 1
-                    q.append((nx, ny))
+                    q.append((nx, ny, abs(board[nx][ny])))
     return ret
 
 
