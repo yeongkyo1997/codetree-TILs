@@ -3,8 +3,6 @@ import heapq
 import math
 import sys
 
-# sys.stdin = open('코드트리 투어', 'r')
-
 
 def dijkstra(start):
     dist[start] = 0
@@ -66,4 +64,5 @@ if __name__ == '__main__':
         else:
             s = data[0]
             start = s
+            dist = collections.defaultdict(lambda: math.inf)
             dijkstra(start)
