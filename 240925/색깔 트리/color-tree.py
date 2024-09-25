@@ -1,7 +1,7 @@
 import sys
 from collections import defaultdict as dd
 
-sys.stdin = open('색깔 트리', 'r')
+# sys.stdin = open('색깔 트리', 'r')
 
 
 class Node:
