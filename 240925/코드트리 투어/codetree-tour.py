@@ -3,6 +3,7 @@ import heapq
 import math
 import sys
 
+input = lambda: sys.stdin.readline().rstrip()
 
 
 def dijkstra(start):
