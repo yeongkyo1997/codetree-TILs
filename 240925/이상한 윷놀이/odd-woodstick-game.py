@@ -1,7 +1,5 @@
 import sys
 
-# sys.stdin = open('이상한 윷놀이', 'r')
-
 
 def move(depth):
     def get_next(x, y, d):
@@ -75,3 +73,5 @@ if __name__ == '__main__':
         if move(0):
             print(t)
             break
+    else:
+        print(-1)
