@@ -2,72 +2,100 @@ import collections
 import heapq
 import math
 import sys
+from collections import defaultdict as dd
 
-input = lambda: sys.stdin.readline().rstrip()
 
 
 def dijkstra(start):
-    dist[start] = 0
+    ret = dd(lambda: math.inf)
     heap = []
-    heapq.heappush(heap, (dist[start], start))
+    ret[start] = 0
+    heapq.heappush(heap, (0, start))
 
     while heap:
         w, x = heapq.heappop(heap)
 
-        if dist[x] < w:
+        if ret[x] < w:
             continue
 
-        for v, nw in graph[x]:
-            if dist[v] > w + nw:
-                dist[v] = w + nw
-                heapq.heappush(heap, (dist[v], v))
+        for num, nw in graph[x]:
+            if ret[num] > nw + w:
+                ret[num] = nw + w
+                heapq.heappush(heap, (ret[num], num))
+
+    return ret
 
 
 if __name__ == '__main__':
     Q = int(input())
-    start = 0
-    dist = collections.defaultdict(lambda: math.inf)
-    items = collections.defaultdict(tuple)
+
+    dist = dd(lambda: math.inf)
+    possible, impossible = [], []
+    possible_set, impossible_set = set(), set()
     ban = set()
+    start = 0
     for _ in range(Q):
-        query, *data = list(map(int, input().split()))
+        query, *data = map(int, input().split())
+
         if query == 100:
             n, m, *data = data
-            tmp = collections.defaultdict(lambda: collections.defaultdict(lambda: math.inf))
+            graph = dd(list)
+            arr = dd(lambda: dd(lambda: math.inf))
             for i in range(m):
-                a, b, cost = data[i * 3:i * 3 + 3]
-                tmp[a][b] = min(tmp[a][b], cost)
-                tmp[b][a] = min(tmp[b][a], cost)
-            graph = collections.defaultdict(list)
-            for s in tmp:
-                graph[s].extend(tmp[s].items())
-            dijkstra(start)
+                v, u, w = data[i * 3:i * 3 + 3]
+                arr[v][u] = min(arr[v][u], w)
+                arr[u][v] = min(arr[u][v], w)
+            graph = dd(list)
+            for key in arr:
+                graph[key].extend(arr[key].items())
+            dist = dijkstra(start)
         elif query == 200:
             idx, revenue, dest = data
-            items[idx] = (revenue, dest)
+            profit = revenue - dist[dest]
+            if profit >= 0:
+                heapq.heappush(possible, (-profit, idx, revenue, dest))
+                possible_set.add(idx)
+            else:
+                impossible.append((-profit, idx, revenue, dest))
+                impossible_set.add(idx)
             ban.discard(idx)
         elif query == 300:
             idx = data[0]
-            if idx in items:
+            if idx in possible_set or idx in impossible_set:
                 ban.add(idx)
+            possible_set.discard(idx)
+            impossible_set.discard(idx)
         elif query == 400:
-            candi = []
-            for idx, (revenue, dest) in items.items():
+            tmp = []
+            while possible:
+                profit, idx, revenue, dest = heapq.heappop(possible)
                 if idx in ban:
                     continue
-                if revenue - dist[dest] < 0:
-                    continue
-                candi.append((-(revenue - dist[dest]), idx, (revenue - dist[dest], idx)))
-            if candi:
-                candi.sort()
+                if idx in possible_set:
+                    print(idx)
+                    ban.add(idx)
+                    possible_set.discard(idx)
+                    break
+                else:
+                    tmp.append((profit, idx, revenue, dest))
             else:
                 print(-1)
-                continue
-            profit, idx = candi[0][-1]
-            print(idx)
-            ban.add(idx)
-        else:
+            for t in tmp:
+                heapq.heappush(possible, t)
+        elif query == 500:
             s = data[0]
-            start = s
-            dist = collections.defaultdict(lambda: math.inf)
-            dijkstra(start)
+            dist = dijkstra(s)
+            possible_tmp, impossible_tmp = [], []
+            possible_set, impossible_set = set(), set()
+            for ele in [possible, impossible]:
+                for _, idx, revenue, dest in ele:
+                    if idx in ban:
+                        continue
+                    profit = revenue - dist[dest]
+                    if profit >= 0:
+                        heapq.heappush(possible_tmp, (-profit, idx, revenue, dest))
+                        possible_set.add(idx)
+                    else:
+                        impossible_tmp.append((-profit, idx, revenue, dest))
+                        impossible_set.add(idx)
+            possible, impossible = possible_tmp, impossible_tmp
