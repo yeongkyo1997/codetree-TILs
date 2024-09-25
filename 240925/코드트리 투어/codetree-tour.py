@@ -4,6 +4,7 @@ import math
 import sys
 
 
+
 def dijkstra(start):
     dist[start] = 0
     heap = []
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     start = 0
     dist = collections.defaultdict(lambda: math.inf)
     items = collections.defaultdict(tuple)
-    pre_command = 0
+    ban = set()
     for _ in range(Q):
         query, *data = list(map(int, input().split()))
         if query == 100:
@@ -43,13 +44,16 @@ if __name__ == '__main__':
         elif query == 200:
             idx, revenue, dest = data
             items[idx] = (revenue, dest)
+            ban.discard(idx)
         elif query == 300:
             idx = data[0]
             if idx in items:
-                del items[idx]
+                ban.add(idx)
         elif query == 400:
             candi = []
             for idx, (revenue, dest) in items.items():
+                if idx in ban:
+                    continue
                 if revenue - dist[dest] < 0:
                     continue
                 candi.append((-(revenue - dist[dest]), idx, (revenue - dist[dest], idx)))
@@ -60,7 +64,7 @@ if __name__ == '__main__':
                 continue
             profit, idx = candi[0][-1]
             print(idx)
-            del items[idx]
+            ban.add(idx)
         else:
             s = data[0]
             start = s
