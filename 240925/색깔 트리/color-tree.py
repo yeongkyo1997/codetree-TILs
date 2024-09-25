@@ -1,9 +1,6 @@
 import sys
 from collections import defaultdict as dd
 
-# sys.stdin = open('색깔 트리', 'r')
-
-
 class Node:
     def __init__(self, id=0, color=0, max_depth=0, parent=0):
         self.id = id
@@ -15,8 +12,8 @@ class Node:
 
 if __name__ == '__main__':
     Q = int(input())
-    node = dd(lambda: Node())
-    check_root = dd(int)
+    node = [Node() for _ in range(100000 + 100)]
+    check_root = [0] * (100000 + 100)
 
     for _ in range(Q):
         query, *data = map(int, input().split())
