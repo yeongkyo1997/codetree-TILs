@@ -2,182 +2,144 @@ import sys
 
 
 
+class Box:
+    def __init__(self, id, weight):
+        self.id = id
+        self.weight = weight
+        self.prev = None
+        self.next = None
 
-def main():
-    class Node:
-        def __init__(self, gift_id, weight):
-            self.id = gift_id
-            self.weight = weight
-            self.prev = None
-            self.next = None
-            self.belt = None
+    def set_prev(self, prev):
+        self.prev = prev
 
-    class Belt:
-        def __init__(self):
-            self.head = None
+    def set_next(self, next):
+        self.next = next
+
+    def cut_prev(self):
+        if self.prev is None:
+            return
+        self.prev.next = None
+        self.prev = None
+
+    def remove(self):
+        if self.next:
+            self.next.prev = self.prev
+        if self.prev:
+            self.prev.next = self.next
+        self.prev = self.next = None
+
+
+class Belt:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+        self.boxes = dict()
+        self.broken = False
+
+    def add_box(self, box):
+        self.boxes[box.id] = box
+        if not self.head:
+            self.head = box
+        else:
+            self.tail.set_next(box)
+            box.set_prev(self.tail)
+        self.tail = box
+
+    def pop_box(self):
+        box = self.head
+        self.head = box.next
+        if self.head:
+            self.head.cut_prev()
+        else:
             self.tail = None
-            self.broken = False
+        del self.boxes[box.id]
+        return box
 
-    q = int(sys.stdin.readline())
-    commands = []
 
-    for _ in range(q):
-        line = sys.stdin.readline().strip()
-        commands.append(line)
+class Factory:
+    def __init__(self, args):
+        N, M, *data = args
+        cnt = N // M
+        self.belts = [Belt() for _ in range(M)]
+        for idx, belt in enumerate(self.belts):
+            for i in range(idx * cnt, (idx + 1) * cnt):
+                belt.add_box(Box(data[i], data[i + N]))
 
-    id_to_node = {}
-    belts = []
-    m = 0  # Number of belts
-
-    for idx, command in enumerate(commands):
-        tokens = command.strip().split()
-        cmd = int(tokens[0])
-
-        if cmd == 100:
-            # Factory establishment
-            n = int(tokens[1])
-            m = int(tokens[2])
-            IDs = list(map(int, tokens[3:3 + n]))
-            Ws = list(map(int, tokens[3 + n:]))
-            belts = [Belt() for _ in range(m)]
-            per_belt = n // m
-            idx_id = 0
-
-            for i in range(m):
-                belt = belts[i]
-                for _ in range(per_belt):
-                    gift_id = IDs[idx_id]
-                    weight = Ws[idx_id]
-                    node = Node(gift_id, weight)
-                    node.belt = i
-                    id_to_node[gift_id] = node
-
-                    if belt.head is None:
-                        belt.head = belt.tail = node
-                    else:
-                        belt.tail.next = node
-                        node.prev = belt.tail
-                        belt.tail = node
-                    idx_id += 1
-            # No output for this command
-
-        elif cmd == 200:
-            # Unload gifts
-            w_max = int(tokens[1])
-            total_weight = 0
-            for i in range(m):
-                belt = belts[i]
-                if belt.broken or belt.head is None:
-                    continue
-                node = belt.head
-                if node.weight <= w_max:
-                    # Unload the gift
-                    total_weight += node.weight
-                    belt.head = node.next
-                    if belt.head:
-                        belt.head.prev = None
-                    else:
-                        belt.tail = None  # Belt is now empty
-                    del id_to_node[node.id]
+    def load(self, max_weight):
+        result = 0
+        for belt in self.belts:
+            if belt.head:
+                box = belt.pop_box()
+                if box.weight <= max_weight:
+                    result += box.weight
                 else:
-                    # Move the gift to the back
-                    if belt.head == belt.tail:
-                        continue  # Only one gift
-                    belt.head = node.next
-                    belt.head.prev = None
-                    belt.tail.next = node
-                    node.prev = belt.tail
-                    node.next = None
-                    belt.tail = node
-            print(total_weight)
+                    belt.add_box(box)
+        return result
 
-        elif cmd == 300:
-            # Remove gift
-            r_id = int(tokens[1])
-            node = id_to_node.get(r_id)
-            if node:
-                belt = belts[node.belt]
-                if node.prev:
-                    node.prev.next = node.next
-                else:
-                    belt.head = node.next
-                if node.next:
-                    node.next.prev = node.prev
-                else:
-                    belt.tail = node.prev
-                del id_to_node[r_id]
-                print(r_id)
-            else:
-                print(-1)
+    def remove(self, id):
+        result = -1
+        for belt in self.belts:
+            if id in belt.boxes:
+                box = belt.boxes[id]
+                if belt.head == box:
+                    belt.head = box.next
+                if belt.tail == box:
+                    belt.tail = box.prev
+                box.remove()
+                result = box.id
+                del belt.boxes[id]
+                break
+        return result
 
-        elif cmd == 400:
-            # Check gift
-            f_id = int(tokens[1])
-            node = id_to_node.get(f_id)
-            if node:
-                belt_num = node.belt + 1  # 1-based indexing
-                print(belt_num)
-                belt = belts[node.belt]
-                if node == belt.head:
-                    continue  # Already at front
-                # Detach segment from node to tail
-                if node.prev:
-                    node.prev.next = None
-                    belt.tail = node.prev
-                    node.prev = None
-                # Attach to front
-                node_tail = node
-                while node_tail.next:
-                    node_tail = node_tail.next
-                node_tail.next = belt.head
-                if belt.head:
-                    belt.head.prev = node_tail
-                belt.head = node
-            else:
-                print(-1)
+    def find(self, id):
+        result = -1
+        for idx, belt in enumerate(self.belts):
+            if id in belt.boxes:
+                box = belt.boxes[id]
+                if belt.head != box:
+                    belt.head.set_prev(belt.tail)
+                    belt.tail.set_next(belt.head)
+                    belt.head = box
+                    belt.tail = box.prev
+                    box.cut_prev()
+                result = idx + 1
+                break
+        return result
 
-        elif cmd == 500:
-            # Belt failure
-            b_num = int(tokens[1]) - 1  # 0-based indexing
-            belt = belts[b_num]
-            if belt.broken:
-                print(-1)
-            else:
-                belt.broken = True
-                print(b_num + 1)
-                # Find next available belt
-                target_belt = None
-                for i in range(1, m + 1):
-                    idx = (b_num + i) % m
-                    if not belts[idx].broken:
-                        target_belt = belts[idx]
+    def die(self, belt_id):
+        result = -1
+        idx = belt_id - 1
+        if not self.belts[idx].broken:
+            result = belt_id
+            broken_belt = self.belts[idx]
+            broken_belt.broken = True
+            if broken_belt.boxes:
+                for i in range(idx + 1, idx + len(self.belts)):
+                    next_belt = self.belts[i % len(self.belts)]
+                    if not next_belt.broken:
+                        next_belt.boxes.update(broken_belt.boxes)
+                        broken_belt.boxes.clear()
+                        if next_belt.head:
+                            broken_belt.tail.set_next(next_belt.head)
+                            next_belt.head.set_prev(broken_belt.tail)
+                        else:
+                            next_belt.tail = broken_belt.tail
+                        next_belt.head = broken_belt.head
+                        broken_belt.head = broken_belt.tail = None
                         break
-                if belt.head is None:
-                    continue  # No gifts to move
-                # Move gifts from belt to target_belt from tail to head
-                # Reverse the belt
-                current = belt.head
-                prev = None
-                while current:
-                    next_node = current.next
-                    current.next = prev
-                    current.prev = next_node
-                    prev = current
-                    current = next_node
-                belt.head, belt.tail = belt.tail, belt.head
-                if target_belt.head is None:
-                    target_belt.head = belt.head
-                    target_belt.tail = belt.tail
-                else:
-                    target_belt.tail.next = belt.head
-                    belt.head.prev = target_belt.tail
-                    target_belt.tail = belt.tail
-                current = belt.head
-                while current:
-                    current.belt = target_belt.broken and b_num or idx
-                    current = current.next
-                belt.head = belt.tail = None
+        return result
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    Q = int(input())
+    _, *args = map(int, input().split())
+    factory = Factory(args)
+    operations = {
+        200: factory.load,
+        300: factory.remove,
+        400: factory.find,
+        500: factory.die,
+    }
+    for _ in range(Q - 1):
+        query, arg = map(int, input().split())
+        print(operations[query](arg))
