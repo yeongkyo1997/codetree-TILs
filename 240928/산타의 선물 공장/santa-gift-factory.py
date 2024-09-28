@@ -2,209 +2,182 @@ import sys
 
 
 
+
 def main():
-
-    input = sys.stdin.read().split()
-    idx = 0
-
-    q = int(input[idx])
-    idx += 1
-
     class Node:
-        def __init__(self, ID, W):
-            self.ID = ID
-            self.W = W
+        def __init__(self, gift_id, weight):
+            self.id = gift_id
+            self.weight = weight
             self.prev = None
             self.next = None
+            self.belt = None
 
     class Belt:
         def __init__(self):
             self.head = None
             self.tail = None
+            self.broken = False
 
-        def append(self, node):
-            if self.tail is None:
-                self.head = self.tail = node
-                node.prev = node.next = None
-            else:
-                self.tail.next = node
-                node.prev = self.tail
-                node.next = None
-                self.tail = node
-
-        def remove_head(self):
-            if self.head is None:
-                return None
-            node = self.head
-            if self.head == self.tail:
-                self.head = self.tail = None
-            else:
-                self.head = self.head.next
-                self.head.prev = None
-            node.next = node.prev = None
-            return node
-
-        def move_head_to_tail(self):
-            if self.head is None or self.head == self.tail:
-                return
-            node = self.head
-            self.head = node.next
-            self.head.prev = None
-            self.tail.next = node
-            node.prev = self.tail
-            node.next = None
-            self.tail = node
-
-        def remove_node(self, node):
-            if node.prev is None:
-                # node is head
-                self.head = node.next
-            else:
-                node.prev.next = node.next
-            if node.next is None:
-                # node is tail
-                self.tail = node.prev
-            else:
-                node.next.prev = node.prev
-            node.prev = node.next = None
-
-        def insert_front_sublist(self, sub_head, sub_tail):
-            if self.head is None:
-                self.head = sub_head
-                self.tail = sub_tail
-                sub_head.prev = None
-                sub_tail.next = None
-            else:
-                sub_tail.next = self.head
-                self.head.prev = sub_tail
-                self.head = sub_head
-                sub_head.prev = None
-
-    belts = []
-    mapping = dict()
-    broken_belts = set()
-    m = 0
-
-    result = []
+    q = int(sys.stdin.readline())
+    commands = []
 
     for _ in range(q):
-        if idx >= len(input):
-            break
-        cmd = int(input[idx])
-        idx += 1
+        line = sys.stdin.readline().strip()
+        commands.append(line)
+
+    id_to_node = {}
+    belts = []
+    m = 0  # Number of belts
+
+    for idx, command in enumerate(commands):
+        tokens = command.strip().split()
+        cmd = int(tokens[0])
+
         if cmd == 100:
-            n = int(input[idx])
-            m = int(input[idx + 1])
-            idx += 2
-            ids = list(map(int, input[idx:idx + n]))
-            idx += n
-            weights = list(map(int, input[idx:idx + n]))
-            idx += n
-            belts = [Belt() for _ in range(m + 1)]  # 1-based indexing
-            items_per_belt = n // m
-            for i in range(n):
-                belt_num = (i // items_per_belt) + 1
-                node = Node(ids[i], weights[i])
-                belts[belt_num].append(node)
-                mapping[ids[i]] = (belt_num, node)
-            initialized = True
+            # Factory establishment
+            n = int(tokens[1])
+            m = int(tokens[2])
+            IDs = list(map(int, tokens[3:3 + n]))
+            Ws = list(map(int, tokens[3 + n:]))
+            belts = [Belt() for _ in range(m)]
+            per_belt = n // m
+            idx_id = 0
+
+            for i in range(m):
+                belt = belts[i]
+                for _ in range(per_belt):
+                    gift_id = IDs[idx_id]
+                    weight = Ws[idx_id]
+                    node = Node(gift_id, weight)
+                    node.belt = i
+                    id_to_node[gift_id] = node
+
+                    if belt.head is None:
+                        belt.head = belt.tail = node
+                    else:
+                        belt.tail.next = node
+                        node.prev = belt.tail
+                        belt.tail = node
+                    idx_id += 1
+            # No output for this command
+
         elif cmd == 200:
-            # Unload
-            if idx >= len(input):
-                w_max = 0
-            else:
-                w_max = int(input[idx])
-                idx += 1
-            total = 0
-            for belt_num in range(1, m + 1):
-                if belt_num in broken_belts:
-                    continue
-                belt = belts[belt_num]
-                if belt.head is None:
+            # Unload gifts
+            w_max = int(tokens[1])
+            total_weight = 0
+            for i in range(m):
+                belt = belts[i]
+                if belt.broken or belt.head is None:
                     continue
                 node = belt.head
-                if node.W <= w_max:
-                    total += node.W
-                    belt.remove_head()
-                    del mapping[node.ID]
+                if node.weight <= w_max:
+                    # Unload the gift
+                    total_weight += node.weight
+                    belt.head = node.next
+                    if belt.head:
+                        belt.head.prev = None
+                    else:
+                        belt.tail = None  # Belt is now empty
+                    del id_to_node[node.id]
                 else:
-                    belt.move_head_to_tail()
-            result.append(str(total))
-        elif cmd == 300:
-            # Remove
-            if idx >= len(input):
-                r_id = -1
-            else:
-                r_id = int(input[idx])
-                idx += 1
-            if r_id in mapping:
-                belt_num, node = mapping[r_id]
-                if belt_num in broken_belts:
-                    result.append("-1")
-                else:
-                    belts[belt_num].remove_node(node)
-                    del mapping[r_id]
-                    result.append(str(r_id))
-            else:
-                result.append("-1")
-        elif cmd == 400:
-            # Find and rearrange
-            if idx >= len(input):
-                f_id = -1
-            else:
-                f_id = int(input[idx])
-                idx += 1
-            if f_id in mapping:
-                belt_num, node = mapping[f_id]
-                if belt_num in broken_belts:
-                    result.append("-1")
-                    continue
-                result.append(str(belt_num))
-                belt = belts[belt_num]
-                if node.next is not None:
-                    sub_head = node.next
-                    sub_tail = belt.tail
-                    belt.tail = node
+                    # Move the gift to the back
+                    if belt.head == belt.tail:
+                        continue  # Only one gift
+                    belt.head = node.next
+                    belt.head.prev = None
+                    belt.tail.next = node
+                    node.prev = belt.tail
                     node.next = None
-                    sub_head.prev = None
-                    sub_tail.next = belt.head
-                    if belt.head is not None:
-                        belt.head.prev = sub_tail
-                    belt.head = sub_head
+                    belt.tail = node
+            print(total_weight)
+
+        elif cmd == 300:
+            # Remove gift
+            r_id = int(tokens[1])
+            node = id_to_node.get(r_id)
+            if node:
+                belt = belts[node.belt]
+                if node.prev:
+                    node.prev.next = node.next
+                else:
+                    belt.head = node.next
+                if node.next:
+                    node.next.prev = node.prev
+                else:
+                    belt.tail = node.prev
+                del id_to_node[r_id]
+                print(r_id)
             else:
-                result.append("-1")
+                print(-1)
+
+        elif cmd == 400:
+            # Check gift
+            f_id = int(tokens[1])
+            node = id_to_node.get(f_id)
+            if node:
+                belt_num = node.belt + 1  # 1-based indexing
+                print(belt_num)
+                belt = belts[node.belt]
+                if node == belt.head:
+                    continue  # Already at front
+                # Detach segment from node to tail
+                if node.prev:
+                    node.prev.next = None
+                    belt.tail = node.prev
+                    node.prev = None
+                # Attach to front
+                node_tail = node
+                while node_tail.next:
+                    node_tail = node_tail.next
+                node_tail.next = belt.head
+                if belt.head:
+                    belt.head.prev = node_tail
+                belt.head = node
+            else:
+                print(-1)
+
         elif cmd == 500:
-            if idx >= len(input):
-                b_num = -1
+            # Belt failure
+            b_num = int(tokens[1]) - 1  # 0-based indexing
+            belt = belts[b_num]
+            if belt.broken:
+                print(-1)
             else:
-                b_num = int(input[idx])
-                idx += 1
-            if b_num in broken_belts:
-                result.append("-1")
-            else:
-                broken_belts.add(b_num)
-                belt = belts[b_num]
-                target_belt_num = -1
+                belt.broken = True
+                print(b_num + 1)
+                # Find next available belt
+                target_belt = None
                 for i in range(1, m + 1):
-                    j = (b_num + i) if (b_num + i) <= m else (b_num + i - m)
-                    if j not in broken_belts:
-                        target_belt_num = j
+                    idx = (b_num + i) % m
+                    if not belts[idx].broken:
+                        target_belt = belts[idx]
                         break
-                if belt.head is not None:
-                    target_belt = belts[target_belt_num]
-                    cur = belt.head
-                    while cur is not None:
-                        next_node = cur.next
-                        target_belt.append(cur)
-                        mapping[cur.ID] = (target_belt_num, cur)
-                        cur = next_node
-                    belt.head = belt.tail = None
-                result.append(str(b_num))
-        else:
-            pass
+                if belt.head is None:
+                    continue  # No gifts to move
+                # Move gifts from belt to target_belt from tail to head
+                # Reverse the belt
+                current = belt.head
+                prev = None
+                while current:
+                    next_node = current.next
+                    current.next = prev
+                    current.prev = next_node
+                    prev = current
+                    current = next_node
+                belt.head, belt.tail = belt.tail, belt.head
+                if target_belt.head is None:
+                    target_belt.head = belt.head
+                    target_belt.tail = belt.tail
+                else:
+                    target_belt.tail.next = belt.head
+                    belt.head.prev = target_belt.tail
+                    target_belt.tail = belt.tail
+                current = belt.head
+                while current:
+                    current.belt = target_belt.broken and b_num or idx
+                    current = current.next
+                belt.head = belt.tail = None
 
-    print('\n'.join(result))
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
