@@ -15,11 +15,11 @@ class Belt:
     def __init__(self):
         self.header = None
         self.tail = None
-        self.box_dict = {}
+        self.cnt = 0
 
     # 뒤에 박스 넣기
     def append(self, box):
-        self.box_dict[box.box_id] = box
+        box_dict[box.box_id] = box
 
         if self.tail is None:
             self.header = box
@@ -27,11 +27,12 @@ class Belt:
             self.tail.next = box
             box.prev = self.tail
 
+        self.cnt += 1
         self.tail = box
 
     # 앞에 박스 넣기
     def appendleft(self, box):
-        self.box_dict[box.box_id] = box
+        box_dict[box.box_id] = box
 
         if self.header is None:
             self.tail = box
@@ -39,6 +40,7 @@ class Belt:
             self.header.prev = box
             box.next = self.header
 
+        self.cnt += 1
         self.header = box
 
     # 앞에서 빼기
@@ -55,8 +57,9 @@ class Belt:
         box.next = None
         box.prev = None
 
-        del self.box_dict[box.box_id]
+        del box_dict[box.box_id]
 
+        self.cnt -= 1
         return box
 
     # 뒤에서 빼기
@@ -72,8 +75,9 @@ class Belt:
         box.next = None
         box.prev = None
 
-        del self.box_dict[box.box_id]
+        del box_dict[box.box_id]
 
+        self.cnt -= 1
         return box
 
 
@@ -83,7 +87,7 @@ def step2(m_src, m_dst):
 
     # src_belt가 비어있다면 이동할 박스가 없음
     if not src_belt.header:
-        return len(dst_belt.box_dict)
+        return dst_belt.cnt
 
     # src_belt의 모든 박스를 dst_belt로 옮기기
     if not dst_belt.header:  # dst_belt가 비어있다면
@@ -95,13 +99,13 @@ def step2(m_src, m_dst):
         dst_belt.header.prev = src_belt.tail
         dst_belt.header = src_belt.header
 
-    dst_belt.box_dict.update(src_belt.box_dict)
+    dst_belt.cnt += src_belt.cnt
 
     # src_belt 초기화
     src_belt.header = src_belt.tail = None
-    src_belt.box_dict.clear()
+    src_belt.cnt = 0
 
-    return len(dst_belt.box_dict)
+    return dst_belt.cnt
 
 
 def step3(m_src, m_dst):
@@ -126,7 +130,7 @@ def step3(m_src, m_dst):
         dst_belt.appendleft(src_box)
         src_belt.appendleft(dst_box)
 
-    return len(dst_belt.box_dict)
+    return dst_belt.cnt
 
 
 def step4(m_src, m_dst):
@@ -134,11 +138,11 @@ def step4(m_src, m_dst):
     dst_belt = belts[m_dst]
 
     # src_belt가 비어있으면 아무 작업도 하지 않음
-    if len(src_belt.box_dict) <= 1:
-        return len(dst_belt.box_dict)
+    if src_belt.cnt <= 1:
+        return dst_belt.cnt
 
     # src_belt에서 절반의 박스를 dst_belt의 앞쪽에 옮기기
-    size = len(src_belt.box_dict) // 2
+    size = src_belt.cnt // 2
     tmp = collections.deque()
 
     # src_belt에서 size만큼 popleft 해서 임시 deque에 넣기
@@ -149,19 +153,17 @@ def step4(m_src, m_dst):
     while tmp:
         dst_belt.appendleft(tmp.pop())
 
-    return len(dst_belt.box_dict)
+    return dst_belt.cnt
 
 
 def step5(p_num):
     a, b = -1, -1
-    for belt in belts[1:]:
-        if p_num in belt.box_dict:
-            box = belt.box_dict[p_num]
-            if box.prev is not None:
-                a = box.prev.box_id
-            if box.next is not None:
-                b = box.next.box_id
-            break
+    if p_num in box_dict:
+        box = box_dict[p_num]
+        if box.prev is not None:
+            a = box.prev.box_id
+        if box.next is not None:
+            b = box.next.box_id
 
     return a + 2 * b
 
@@ -176,7 +178,7 @@ def step6(b_num):
         a = belt.header.box_id
         b = belt.tail.box_id
 
-    c = len(belt.box_dict)
+    c = belt.cnt
 
     return a + 2 * b + 3 * c
 
@@ -184,6 +186,7 @@ def step6(b_num):
 if __name__ == '__main__':
     q = int(input())
     belts = None
+    box_dict = {}
 
     for _ in range(q):
         query, *data = map(int, input().split())
