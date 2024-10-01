@@ -2,6 +2,8 @@ import sys
 
 input = lambda: sys.stdin.readline().rstrip()
 
+print = sys.stdout.write
+
 
 class Box:
     def __init__(self, box_id, weight):
@@ -165,6 +167,7 @@ def step5(b_num):
 
 
 if __name__ == '__main__':
+    results = []
     belts = None
     for _ in range(int(input())):
         query, *data = map(int, input().split())
@@ -183,16 +186,18 @@ if __name__ == '__main__':
                     belt.append(Box(box, weight))
         if query == 200:
             w_max = data[0]
-            print(step2(w_max))
+            results.append(step2(w_max))
 
         if query == 300:
             r_id = data[0]
-            print(step3(r_id))
+            results.append(step3(r_id))
 
         if query == 400:
             f_id = data[0]
-            print(step4(f_id))
+            results.append(step4(f_id))
 
         if query == 500:
             b_num = data[0]
-            print(step5(b_num))
+            results.append(step5(b_num))
+
+    print('\n'.join(map(str, results)))
