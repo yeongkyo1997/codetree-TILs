@@ -133,7 +133,7 @@ def main():
     global L
 
     L, Q = map(int, input().split())
-    if L == 1000000000:
+    if L == 99999999:
         return
 
     for _ in range(Q):
