@@ -1,6 +1,8 @@
 import collections
 import sys
 
+input = lambda: sys.stdin.readline().rstrip()
+
 
 class Box:
     def __init__(self, box_id):
