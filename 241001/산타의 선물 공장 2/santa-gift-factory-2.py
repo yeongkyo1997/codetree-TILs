@@ -2,7 +2,6 @@ import collections
 import sys
 
 
-
 class Box:
     def __init__(self, box_id):
         self.box_id = box_id
@@ -160,6 +159,7 @@ def step5(p_num):
                 a = box.prev.box_id
             if box.next is not None:
                 b = box.next.box_id
+            break
 
     return a + 2 * b
 
