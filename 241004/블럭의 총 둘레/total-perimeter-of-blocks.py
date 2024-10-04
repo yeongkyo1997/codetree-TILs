@@ -1,7 +1,6 @@
 import collections
 import sys
 
-sys.stdin = open('블록의 총 둘레', 'r')
 
 
 def bfs(x, y):
