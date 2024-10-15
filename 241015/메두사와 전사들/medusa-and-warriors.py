@@ -442,10 +442,7 @@ if __name__ == "__main__":
     # 거리 맵 생성
     dist_map = get_dist_map(board)
 
-    # 메두사가 도착 지점에 도달할 수 없는 경우
-    if dist_map[medusa.x][medusa.y] == 0 and (medusa.x != Er or medusa.y != Ec):
-        print(-1)
-    else:
+    try:
         results = []
 
         # 메두사가 도착할 때까지 시뮬레이션 반복
@@ -480,3 +477,5 @@ if __name__ == "__main__":
             reset_warriors_status()
 
         print("\n".join(results))
+    except:
+        print(-1)
